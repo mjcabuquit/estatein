@@ -2,48 +2,58 @@
 
 **Author:** Mark Joseph Cabuquit
 **Live site:** https://mjcabuquit-wp.infinityfreeapp.com
-**Repository:** [add GitHub URL]
-**Design source:** "Real Estate Business Website UI Template (Dark Theme)" Figma file, home page (desktop, laptop and mobile frames)
+**Repository:** https://github.com/mjcabuquit/estatein
+**Design source:** "Real Estate Business Website UI Template (Dark Theme)" Figma file (desktop, laptop and mobile frames)
 
 ## Scope
 
-This was a time-boxed trial (4 hours), so I prioritized a faithful, responsive **home page** and the reusable parts every other page depends on (header, footer, global styles, content model) over covering every page shallowly.
+This was a time-boxed trial (4 hours), so I prioritized faithful, responsive pages and the reusable parts every page depends on (header, footer, global styles, content model) over covering every page shallowly.
 
-**Built:** announcement bar, header and navigation, hero with stats and badge, feature tiles, Featured Properties, client testimonials, FAQ, call-to-action band, and footer. All are responsive across mobile, tablet and desktop.
+**Built:**
+- **Home:** announcement bar, header, hero with stats and badge, feature tiles, Featured Properties, testimonials, FAQ, call-to-action, footer.
+- **About Us:** journey, values, achievements, six-step process, team, and valued clients.
+- **Properties:** search and filters, property cards, and a working inquiry form.
 
-**Not built yet:** the other pages in the Figma file, and a working contact/subscribe form. The footer email box is markup only.
+**Not built:** Services and Contact Us pages, and the footer newsletter box (markup only).
 
 ## Approach
 
-1. **Custom theme from scratch** (HTML, CSS, PHP, a little vanilla JavaScript). No page builder and no starter theme, so the code stays small and readable.
-2. **Reusable structure:** `header.php` and `footer.php` are shared by every template. `functions.php` handles setup, asset loading, the Property post type, and small helper functions (`estatein_icon()`, `estatein_logo()`, `estatein_field()`) so markup isn't repeated.
-3. **Design tokens as CSS variables** (colors, radius, spacing) in `assets/css/main.css`, so a design change is a one-line edit.
-4. **Mobile behavior:** below 900px the navigation becomes a toggle menu, the hero stacks with the image on top, and each card section becomes a swipeable slider driven by CSS scroll-snap. The arrow buttons and "01 of N" counter work with it (`assets/js/main.js`).
+1. **Custom theme from scratch** (HTML, CSS, PHP, a little vanilla JavaScript), with no page builder and no starter theme.
+2. **Reusable structure:** `header.php`, `footer.php` and `template-parts/cta.php` are shared. `functions.php` holds setup, asset loading, post types and helpers (`estatein_icon()`, `estatein_photo()`, `estatein_section_head()`, `estatein_pager()`, `estatein_field()`), so markup isn't repeated.
+3. **Page templates:** `front-page.php`, `page-about.php` (slug `about`) and `page-properties.php` (slug `properties`).
+4. **Design tokens as CSS variables** in `assets/css/main.css`, so a design change is a one-line edit.
+5. **Responsive behavior:** below 900px the navigation becomes a toggle menu, layouts stack, and card sections become swipeable sliders using CSS scroll-snap. Arrows and the "01 of N" counter work with them (`assets/js/main.js`).
 
 ## Content management
 
-- **Properties** are a custom post type. The client adds a title, excerpt and featured image, then fills four fields: bedrooms, bathrooms, property type and price.
-- **Fields** use the free **Advanced Custom Fields (ACF)** plugin. `estatein_field()` falls back to plain post meta if ACF isn't active.
-- **Ordering:** each property has an **Order** number (Page Attributes panel). The home page sorts by it, then by newest.
-- **Menus:** the header menu uses WordPress's menu system (Appearance → Menus), with a hardcoded fallback.
-- **Testimonials and FAQs** are written directly in `front-page.php`. This was a deliberate scope decision. Making them editable would mean two more post types, and is the first thing I would add next.
+- **Properties** are a custom post type. The client adds a title, excerpt and featured image, plus ACF fields: `bedrooms`, `bathrooms`, `property_type`, `price`, `location`, `size`, `build_year` and an optional `tagline`. `estatein_field()` falls back to plain post meta if ACF is inactive.
+- **Ordering:** each property has an Order number (Page Attributes); the home page sorts by it, then by newest.
+- **Filters:** the Properties page filters by keyword and by location, type, price range, size and build year. Option lists live in one function, `estatein_filters()`.
+- **Inquiries:** the form posts to `admin-post.php`, is saved as a private **Inquiry** in the dashboard, and is also emailed to the site admin.
+- **Menus:** managed under Appearance → Menus (with a built-in fallback).
+- **Testimonials, FAQs, team and client cards** are written in the templates. This was a deliberate scope decision. The first thing I'd add next is post types for them.
+
+## Form security
+
+Nonce check, server-side sanitization and validation (name, valid email, terms accepted), a hidden honeypot field for bots, and escaped output everywhere.
 
 ## Accessibility, SEO and performance
 
-- **Accessibility:** semantic landmarks (`header`, `nav`, `main`, `footer`), one `h1`, a skip link, visible keyboard focus, labelled icon buttons, `aria-label` on the star ratings, and reduced-motion support.
-- **SEO:** WordPress's `title-tag` support for page titles, descriptive alt text on meaningful images, and semantic HTML. Decorative icons use empty alt text.
-- **Performance:** icons are small SVGs, photos are lazy-loaded, the hero badge is resized to 2x its display size, and only one web font (Urbanist, two weights) is loaded. Stylesheet and script versions are tied to file modification time, so updates are never served stale from cache.
-- **Not yet done:** CSS and JS minification, and responsive `srcset` tuning for property photos. On a production build I would add a caching/optimization plugin or a build step.
+- **Accessibility:** semantic landmarks, one `h1` per page, a skip link, visible keyboard focus, labelled form fields and icon buttons, `role="status"`/`"alert"` on form messages, and reduced-motion support.
+- **SEO:** `title-tag` support, descriptive alt text on meaningful images, empty alt on decorative icons, and semantic HTML.
+- **Performance:** SVG icons, lazy-loaded images, one web font (Urbanist, two weights), and photos resized and converted to WebP (each about 10 to 50 KB). The house and team photos have real transparency, so no white edges show on the dark cards. Stylesheet and script versions follow file modification time, so updates aren't served stale from cache.
+- **Not yet done:** CSS/JS minification and responsive `srcset` tuning. On a production build I'd add a caching/optimization plugin or a build step.
 
 ## Known limitations
 
-- Only the home page is implemented.
-- The hero background image is set through **Appearance → Customize → Additional CSS** on the live site, so it lives in the database rather than the theme files. [Update this line if you move it into the theme.]
-- Pixel-level fidelity was checked against screenshots of the Figma frames, not against Figma's inspect values, so small spacing differences are possible.
-- Cross-browser testing: [state which browsers and devices you actually tested].
+- Services and Contact Us pages are not built.
+- Free hosting often blocks outgoing mail, so the admin email may not arrive. Inquiries are still saved in the dashboard.
+- On desktop the slider arrows do not move anything, because all cards fit on screen. They work on mobile.
+- The hero background image is set through Appearance → Customize → Additional CSS on the live site, so it lives in the database, not the theme files. [Update if you move it into the theme.]
+- Fidelity was checked against screenshots of the Figma frames, not Figma's inspect values, so small spacing differences are possible.
+- Cross-browser testing was done in Chrome, Firefox and Safari Mobile. Edge and desktop Safari were not tested.
 
 ## Tools
 
-- **WordPress** with **Advanced Custom Fields** (free); hosted on InfinityFree.
-- **Git/GitHub** for version control.
-- **AI assistance:** I used Claude to generate the first pass of the theme code from the Figma screenshots and exported assets. I reviewed each file, installed and tested it on the live site, and directed the fixes (for example, caching, tag icon sizing, and tile alignment) based on what I saw in the browser.
+- **WordPress** with **Advanced Custom Fields** (free); hosted on InfinityFree; Git/GitHub for version control.
+- **AI assistance:** I used Claude to generate the first pass of the theme code from the Figma screenshots and exported assets. I reviewed each file, installed and tested it on the live site, and directed the fixes (caching, icon sizing, image edges, layout details) based on what I saw in the browser.

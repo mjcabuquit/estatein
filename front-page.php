@@ -27,7 +27,7 @@ $faqs = array(
 		<div class="hero__copy">
 			<h1>Discover Your Dream Property with Estatein</h1>
 			<p>Your journey to finding the perfect property begins here. Explore our listings to find the home that matches your dreams.</p>
-			<div class="btns"><a class="btn btn--dark" href="#">Learn More</a><a class="btn btn--primary" href="#properties">Browse Properties</a></div>
+			<div class="btns"><a class="btn btn--dark" href="<?php echo esc_url( home_url( '/about/' ) ); ?>">Learn More</a><a class="btn btn--primary" href="<?php echo esc_url( home_url( '/properties/' ) ); ?>">Browse Properties</a></div>
 			<ul class="stats">
 				<li><b>200+</b>Happy Customers</li><li><b>10k+</b>Properties For Clients</li><li><b>16+</b>Years of Experience</li>
 			</ul>
@@ -39,20 +39,20 @@ $faqs = array(
 </section>
 
 <section class="sec wrap" id="properties">
-	<?php estatein_section_head( 'Featured Properties', 'Explore our handpicked selection of featured properties. Each listing offers a glimpse into exceptional homes and investments available through Estatein. Click "View Details" for more information.', 'View All Properties', get_post_type_archive_link( 'property' ) ); ?>
+	<?php estatein_section_head( 'Featured Properties', 'Explore our handpicked selection of featured properties. Each listing offers a glimpse into exceptional homes and investments available through Estatein. Click "View Details" for more information.', 'View All Properties', home_url( '/properties/' ) ); ?>
 	<?php $q = new WP_Query( array( 'post_type' => 'property', 'posts_per_page' => 6, 'orderby' => array( 'menu_order' => 'ASC', 'date' => 'DESC' ) ) ); ?>
 	<div class="slider">
 		<?php if ( $q->have_posts() ) : while ( $q->have_posts() ) : $q->the_post(); ?>
 			<article class="card">
 				<?php if ( has_post_thumbnail() ) { the_post_thumbnail( 'property-card', array( 'loading' => 'lazy' ) ); } ?>
 				<h3><?php the_title(); ?></h3>
-				<p><?php echo esc_html( wp_trim_words( get_the_excerpt(), 16, '…' ) ); ?> <a href="<?php the_permalink(); ?>"><u>Read More</u></a></p>
+				<p><?php echo esc_html( wp_trim_words( estatein_field( 'home_excerpt' ) ? estatein_field( 'home_excerpt' ) : get_the_excerpt(), 16, '…' ) ); ?> <a href="<?php the_permalink(); ?>"><u>Read More</u></a></p>
 				<ul class="tags">
 					<li><?php estatein_icon( 'bedroom' ); echo esc_html( estatein_field( 'bedrooms' ) ); ?>-Bedroom</li>
 					<li><?php estatein_icon( 'bathroom' ); echo esc_html( estatein_field( 'bathrooms' ) ); ?>-Bathroom</li>
 					<li><?php estatein_icon( 'villa' ); echo esc_html( estatein_field( 'property_type' ) ); ?></li>
 				</ul>
-				<div class="card__foot"><span><small>Price</small>$<?php echo esc_html( number_format_i18n( (float) estatein_field( 'price' ) ) ); ?></span><a class="btn btn--primary" href="<?php the_permalink(); ?>">View Property Details</a></div>
+				<div class="card__foot"><span><small>Price</small>$<?php echo esc_html( number_format_i18n( (float) ( estatein_field( 'home_price' ) ? estatein_field( 'home_price' ) : estatein_field( 'price' ) ) ) ); ?></span><a class="btn btn--primary" href="<?php the_permalink(); ?>">View Property Details</a></div>
 			</article>
 		<?php endwhile; wp_reset_postdata(); else : ?>
 			<p class="empty">No properties yet. Add some under Properties in the dashboard.</p>

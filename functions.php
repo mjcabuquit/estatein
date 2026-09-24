@@ -80,3 +80,60 @@ function estatein_photo( $file, $w, $h, $alt = '' ) {
 		printf( '<span class="ph" style="aspect-ratio:%d/%d" role="img" aria-label="%s"></span>', (int) $w, (int) $h, esc_attr( $alt ) );
 	}
 }
+
+/** Filter definitions for the Properties page: meta key => label + options (value => label, or plain list). */
+function estatein_filters() {
+	return array(
+		'location'      => array( 'Location', array( 'Coastal', 'City Center', 'Countryside' ) ),
+		'property_type' => array( 'Property Type', array( 'Villa', 'Apartment', 'Townhouse', 'Cottage' ) ),
+		'price'         => array( 'Pricing Range', array( '0-300000' => 'Under $300,000', '300000-700000' => '$300,000 – $700,000', '700000-1500000' => '$700,000 – $1,500,000', '1500000-99999999' => 'Over $1,500,000' ) ),
+		'size'          => array( 'Property Size', array( '0-1000' => 'Under 1,000 sq ft', '1000-2500' => '1,000 – 2,500 sq ft', '2500-99999' => 'Over 2,500 sq ft' ) ),
+		'build_year'    => array( 'Build Year', array( '2020-2100' => '2020 or later', '2010-2019' => '2010 – 2019', '1900-2009' => 'Before 2010' ) ),
+	);
+}
+
+/** Render <option> tags from a plain list or a value => label map. */
+function estatein_options( $opts, $selected = '', $placeholder = '' ) {
+	if ( $placeholder ) {
+		echo '<option value="">' . esc_html( $placeholder ) . '</option>';
+	}
+	foreach ( $opts as $k => $label ) {
+		$val = is_int( $k ) ? $label : $k;
+		printf( '<option value="%s"%s>%s</option>', esc_attr( $val ), selected( $selected, $val, false ), esc_html( $label ) );
+	}
+}
+
+/** Inquiries are stored in the dashboard (Inquiries) and also emailed to the site admin. */
+add_action( 'init', function () {
+	register_post_type( 'inquiry', array(
+		'labels'    => array( 'name' => 'Inquiries', 'singular_name' => 'Inquiry' ),
+		'public'    => false,
+		'show_ui'   => true,
+		'menu_icon' => 'dashicons-email',
+		'supports'  => array( 'title', 'editor' ),
+	) );
+} );
+
+add_action( 'admin_post_nopriv_estatein_inquiry', 'estatein_handle_inquiry' );
+add_action( 'admin_post_estatein_inquiry', 'estatein_handle_inquiry' );
+function estatein_handle_inquiry() {
+	$back  = wp_get_referer() ? remove_query_arg( array( 'sent', 'error' ), wp_get_referer() ) : home_url( '/properties/' );
+	$nonce = isset( $_POST['_wpnonce'] ) ? sanitize_text_field( wp_unslash( $_POST['_wpnonce'] ) ) : '';
+	$get   = function ( $k ) { return isset( $_POST[ $k ] ) ? sanitize_text_field( wp_unslash( $_POST[ $k ] ) ) : ''; };
+	$email = sanitize_email( $get( 'email' ) );
+	if ( ! wp_verify_nonce( $nonce, 'estatein_inquiry' ) || $get( 'website' ) || ! $get( 'agree' ) || ! $get( 'first_name' ) || ! $get( 'last_name' ) || ! is_email( $email ) ) {
+		wp_safe_redirect( add_query_arg( 'error', '1', $back ) . '#inquiry' );
+		exit;
+	}
+	$name  = $get( 'first_name' ) . ' ' . $get( 'last_name' );
+	$lines = array( "Name: $name", "Email: $email", 'Phone: ' . $get( 'phone' ) );
+	foreach ( array( 'location', 'property_type', 'bathrooms', 'bedrooms', 'budget', 'contact_method' ) as $k ) {
+		$lines[] = ucwords( str_replace( '_', ' ', $k ) ) . ': ' . $get( $k );
+	}
+	$lines[] = 'Message: ' . ( isset( $_POST['message'] ) ? sanitize_textarea_field( wp_unslash( $_POST['message'] ) ) : '' );
+	$body    = implode( "\n", $lines );
+	wp_insert_post( array( 'post_type' => 'inquiry', 'post_status' => 'private', 'post_title' => $name, 'post_content' => $body ) );
+	wp_mail( get_option( 'admin_email' ), 'New property inquiry: ' . $name, $body, array( 'Reply-To: ' . $email ) );
+	wp_safe_redirect( add_query_arg( 'sent', '1', $back ) . '#inquiry' );
+	exit;
+}

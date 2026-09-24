@@ -19,7 +19,7 @@
 		<nav id="nav" class="nav" aria-label="Primary">
 			<?php
 			wp_nav_menu( array( 'theme_location' => 'primary', 'container' => false, 'menu_class' => 'nav__list', 'fallback_cb' => function () {
-				echo '<ul class="nav__list"><li class="current-menu-item"><a href="' . esc_url( home_url( '/' ) ) . '">Home</a></li><li><a href="' . esc_url( home_url( '/about/' ) ) . '">About Us</a></li><li><a href="' . esc_url( home_url( '/#properties' ) ) . '">Properties</a></li><li><a href="#">Services</a></li></ul>';
+				echo '<ul class="nav__list"><li class="current-menu-item"><a href="' . esc_url( home_url( '/' ) ) . '">Home</a></li><li><a href="' . esc_url( home_url( '/about/' ) ) . '">About Us</a></li><li><a href="' . esc_url( home_url( '/properties/' ) ) . '">Properties</a></li><li><a href="#">Services</a></li></ul>';
 			} ) );
 			?>
 			<a class="btn btn--dark nav__cta" href="<?php echo esc_url( home_url( '/contact' ) ); ?>">Contact Us</a>
