@@ -56,3 +56,27 @@ function estatein_logo() {
 		esc_attr( get_bloginfo( 'name' ) )
 	);
 }
+
+/** Section heading with optional button, shared by all templates. */
+function estatein_section_head( $title, $text, $btn = '', $url = '#' ) { ?>
+	<div class="sec-head">
+		<div><h2><?php echo esc_html( $title ); ?></h2><p><?php echo esc_html( $text ); ?></p></div>
+		<?php if ( $btn ) : ?><a class="btn btn--dark" href="<?php echo esc_url( $url ); ?>"><?php echo esc_html( $btn ); ?></a><?php endif; ?>
+	</div>
+<?php }
+
+/** Slider pager ("01 of N" plus arrows). */
+function estatein_pager( $total ) { ?>
+	<div class="pager"><span><b>01</b> of <?php echo (int) $total; ?></span>
+		<div><button type="button" class="pager__prev" data-dir="-1" aria-label="Previous" disabled><?php estatein_icon( 'arrow_disable', 30, 'off' ); estatein_icon( 'arrow_right', 30, 'on' ); ?></button><button type="button" data-dir="1" aria-label="Next"><?php estatein_icon( 'arrow_right', 30 ); ?></button></div>
+	</div>
+<?php }
+
+/** Photo from assets/images, or a neutral placeholder until the file is added. */
+function estatein_photo( $file, $w, $h, $alt = '' ) {
+	if ( file_exists( get_theme_file_path( 'assets/images/' . $file ) ) ) {
+		printf( '<img src="%s" width="%d" height="%d" alt="%s" loading="lazy">', esc_url( get_theme_file_uri( 'assets/images/' . $file ) ), (int) $w, (int) $h, esc_attr( $alt ) );
+	} else {
+		printf( '<span class="ph" style="aspect-ratio:%d/%d" role="img" aria-label="%s"></span>', (int) $w, (int) $h, esc_attr( $alt ) );
+	}
+}

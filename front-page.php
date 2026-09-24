@@ -19,19 +19,7 @@ $faqs = array(
 	array( 'How can I contact an Estatein agent?', 'Discover the different ways you can get in touch with our experienced agents.' ),
 );
 
-/** Section header partial-in-a-function to keep markup consistent. */
-function estatein_section_head( $title, $text, $btn, $url = '#' ) { ?>
-	<div class="sec-head">
-		<div><h2><?php echo esc_html( $title ); ?></h2><p><?php echo esc_html( $text ); ?></p></div>
-		<a class="btn btn--dark" href="<?php echo esc_url( $url ); ?>"><?php echo esc_html( $btn ); ?></a>
-	</div>
-<?php }
-
-function estatein_pager( $total ) { ?>
-	<div class="pager"><span><b>01</b> of <?php echo (int) $total; ?></span>
-		<div><button type="button" class="pager__prev" data-dir="-1" aria-label="Previous" disabled><?php estatein_icon( 'arrow_disable', 30, 'off' ); estatein_icon( 'arrow_right', 30, 'on' ); ?></button><button type="button" data-dir="1" aria-label="Next"><?php estatein_icon( 'arrow_right', 30 ); ?></button></div>
-	</div>
-<?php } ?>
+?>
 
 <main id="main">
 <section class="hero">
@@ -97,11 +85,6 @@ function estatein_pager( $total ) { ?>
 	<?php estatein_pager( 10 ); ?>
 </section>
 
-<section class="cta">
-	<div class="wrap cta__in">
-		<div><h2>Start Your Real Estate Journey Today</h2><p>Your dream property is just a click away. Whether you're looking for a new home, a strategic investment, or expert real estate advice, Estatein is here to assist you every step of the way. Take the first step towards your real estate goals and explore our available properties or get in touch with our team for personalized assistance.</p></div>
-		<a class="btn btn--primary" href="#properties">Explore Properties</a>
-	</div>
-</section>
+<?php get_template_part( 'template-parts/cta' ); ?>
 </main>
 <?php get_footer(); ?>
